@@ -19,6 +19,9 @@
     <log4j.version>2.3</log4j.version>
   </properties>
   <dependencies>
+  
+  	
+  	
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
@@ -145,6 +148,26 @@
       <artifactId>javax.servlet-api</artifactId>
       <version>3.1.0</version>
     </dependency>
+    <dependency>
+	  <groupId>com.pi4j</groupId>
+	  <artifactId>pi4j-core</artifactId>
+	  <version>1.0</version>
+	</dependency>
+	<dependency>
+		<groupId>com.pi4j</groupId>
+		<artifactId>pi4j-gpio-extension</artifactId>
+		<version>1.0</version>
+	</dependency>
+	<dependency>
+		<groupId>com.pi4j</groupId>
+		<artifactId>pi4j-device</artifactId>
+		<version>1.0</version>
+	</dependency>
+	<dependency>
+		<groupId>com.pi4j</groupId>
+		<artifactId>pi4j-service</artifactId>
+		<version>1.0</version>
+	</dependency>
   </dependencies>
   <build>
     <resources>
@@ -187,7 +210,7 @@
               <argument>-classpath</argument>
               <classpath/>
               <argument>-Djna.library.path=${env.VLC_PATH}</argument>
-              <argument>com.amazon.alexa.avs.AVSApp</argument>
+              <argument>com.amazon.alexa.avs.AVSGPIOListener</argument>
             </arguments>
           </configuration>
         </plugin>

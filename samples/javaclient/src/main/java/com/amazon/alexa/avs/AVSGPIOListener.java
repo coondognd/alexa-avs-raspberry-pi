@@ -1,6 +1,10 @@
 package com.amazon.alexa.avs;
 
 
+import java.awt.event.ActionEvent;
+
+import javax.swing.JOptionPane;
+
 import com.amazon.alexa.avs.auth.AccessTokenListener;
 import com.amazon.alexa.avs.auth.AuthSetup;
 import com.amazon.alexa.avs.auth.companionservice.RegCodeDisplayHandler;
@@ -9,6 +13,9 @@ import com.amazon.alexa.avs.config.DeviceConfigUtils;
 import com.amazon.alexa.avs.http.AVSClientFactory;
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory; 
+import com.pi4j.io.gpio.RaspiPin;
+
+import com.pi4j.io.gpio.GpioPinDigitalInput;
 
 public class AVSGPIOListener implements ExpectSpeechListener, RecordingRMSListener,
 RegCodeDisplayHandler, AccessTokenListener {
@@ -23,14 +30,11 @@ RegCodeDisplayHandler, AccessTokenListener {
 
     public static void main(String[] args) throws Exception {
         if (args.length == 1) {
-            new AVSApp(args[0]);
+            new AVSGPIOListener(args[0]);
         } else {
-            new AVSApp();
+            new AVSGPIOListener();
         }
         
-
-        // get a handle to the GPIO controller
-    	final GpioController gpio = GpioFactory.getInstance(); 
     }
 
     public AVSGPIOListener() throws Exception {
@@ -52,6 +56,16 @@ RegCodeDisplayHandler, AccessTokenListener {
         authSetup.startProvisioningThread();
 
         controller.startHandlingDirectives();
+        
+        
+
+
+        // get a handle to the GPIO controller
+    	final GpioController gpio = GpioFactory.getInstance(); 
+    	
+    	final GpioPinDigitalInput pin = gpio.provisionDigitalInputPin(RaspiPin.GPIO_01, "PinLED");
+    	
+    	pin.addListener(arg0);
     }
 
     protected AVSClientFactory getAVSClientFactory(DeviceConfig config) {
@@ -122,5 +136,36 @@ RegCodeDisplayHandler, AccessTokenListener {
     @Override
     public synchronized void onAccessTokenReceived(String accessToken) {
     	System.out.println("Received token: " + accessToken);
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+        controller.onUserActivity();
+        //if (actionButton.getText().equals(START_LABEL)) { // if in idle mode
+        //    actionButton.setText(STOP_LABEL);
+
+            RequestListener requestListener = new RequestListener() {
+
+                @Override
+                public void onRequestSuccess() {
+                    finishProcessing();
+                }
+
+                @Override
+                public void onRequestError(Throwable e) {
+                    log.error("An error occured creating speech request", e);
+                    JOptionPane.showMessageDialog(getContentPane(), e.getMessage(), "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    actionButton.doClick();
+                    finishProcessing();
+                }
+            };
+
+            controller.startRecording(rmsListener, requestListener);
+        //} else { // else we must already be in listening
+          //  actionButton.setText(PROCESSING_LABEL); // go into processing mode
+          //  actionButton.setEnabled(false);
+            visualizer.setIndeterminate(true);
+            controller.stopRecording(); // stop the recording so the request can complete
+        //}
     }
 }
