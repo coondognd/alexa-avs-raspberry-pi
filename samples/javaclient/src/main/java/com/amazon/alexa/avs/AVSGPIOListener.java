@@ -1,10 +1,6 @@
 package com.amazon.alexa.avs;
 
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.JOptionPane;
-
 import com.amazon.alexa.avs.auth.AccessTokenListener;
 import com.amazon.alexa.avs.auth.AuthSetup;
 import com.amazon.alexa.avs.auth.companionservice.RegCodeDisplayHandler;
@@ -14,6 +10,10 @@ import com.amazon.alexa.avs.http.AVSClientFactory;
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory; 
 import com.pi4j.io.gpio.RaspiPin;
+import com.pi4j.io.gpio.PinPullResistance;
+import com.pi4j.io.gpio.PinState;
+import com.pi4j.io.gpio.event.GpioPinListenerDigital;
+import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 
 import com.pi4j.io.gpio.GpioPinDigitalInput;
 
@@ -63,9 +63,28 @@ RegCodeDisplayHandler, AccessTokenListener {
         // get a handle to the GPIO controller
     	final GpioController gpio = GpioFactory.getInstance(); 
     	
-    	final GpioPinDigitalInput pin = gpio.provisionDigitalInputPin(RaspiPin.GPIO_01, "PinLED");
+    	final GpioPinDigitalInput myButton = gpio.provisionDigitalInputPin(RaspiPin.GPIO_01, PinPullResistance.PULL_DOWN);
+        // create and register gpio pin listener
     	
-    	pin.addListener(arg0);
+        myButton.addListener(new GpioPinListenerDigital() {
+            @Override
+            public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+                // display pin state on console
+                System.out.println(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
+                actionPerformed(event);
+            }
+            
+        });
+        System.out.println(" ... complete the GPIO #02 circuit and see the listener feedback here in the console.");
+        
+        // keep program running until user aborts (CTRL-C)
+        for (;;) {
+            Thread.sleep(500);
+        }
+        
+        // stop all GPIO activity/threads by shutting down the GPIO controller
+        // (this method will forcefully shutdown all GPIO monitoring threads and scheduled tasks)
+        // gpio.shutdown();   <--- implement this method call if you wish to terminate the Pi4J GPIO controller  
     }
 
     protected AVSClientFactory getAVSClientFactory(DeviceConfig config) {
@@ -138,9 +157,17 @@ RegCodeDisplayHandler, AccessTokenListener {
     	System.out.println("Received token: " + accessToken);
     }
     
-    public void actionPerformed(ActionEvent e) {
+
+    public void finishProcessing() {
+        controller.processingFinished();
+
+    }
+    
+    public void actionPerformed(GpioPinDigitalStateChangeEvent event) {
+        final RecordingRMSListener rmsListener = this;
         controller.onUserActivity();
         //if (actionButton.getText().equals(START_LABEL)) { // if in idle mode
+        if (event.getState() == PinState.HIGH) {
         //    actionButton.setText(STOP_LABEL);
 
             RequestListener requestListener = new RequestListener() {
@@ -152,20 +179,18 @@ RegCodeDisplayHandler, AccessTokenListener {
 
                 @Override
                 public void onRequestError(Throwable e) {
-                    log.error("An error occured creating speech request", e);
-                    JOptionPane.showMessageDialog(getContentPane(), e.getMessage(), "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    actionButton.doClick();
+                	
+                	System.out.println("An error occured creating speech request" + e.getMessage());
                     finishProcessing();
                 }
             };
 
             controller.startRecording(rmsListener, requestListener);
-        //} else { // else we must already be in listening
+        } else { // else we must already be in listening
           //  actionButton.setText(PROCESSING_LABEL); // go into processing mode
           //  actionButton.setEnabled(false);
-            visualizer.setIndeterminate(true);
+           // visualizer.setIndeterminate(true);
             controller.stopRecording(); // stop the recording so the request can complete
-        //}
+        }
     }
 }
