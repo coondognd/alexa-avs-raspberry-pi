@@ -63,7 +63,7 @@ RegCodeDisplayHandler, AccessTokenListener {
         // get a handle to the GPIO controller
     	final GpioController gpio = GpioFactory.getInstance(); 
     	
-    	final GpioPinDigitalInput myButton = gpio.provisionDigitalInputPin(RaspiPin.GPIO_01, PinPullResistance.PULL_DOWN);
+    	final GpioPinDigitalInput myButton = gpio.provisionDigitalInputPin(RaspiPin.GPIO_18, PinPullResistance.PULL_DOWN);
         // create and register gpio pin listener
     	
         myButton.addListener(new GpioPinListenerDigital() {
@@ -150,6 +150,13 @@ RegCodeDisplayHandler, AccessTokenListener {
         System.out.println("Please register your device by visiting the following website on "
                 + "any system and following the instructions:\n" + regUrl
                 + "\n\n Hit OK once completed.");
+
+        try
+        {
+            System.in.read();
+        }
+        catch(Exception e)
+        {}
     }
 
     @Override
