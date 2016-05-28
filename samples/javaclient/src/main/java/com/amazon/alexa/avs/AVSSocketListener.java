@@ -170,6 +170,12 @@ RegCodeDisplayHandler, AccessTokenListener {
         System.out.println("Please register your device by visiting the following website on "
                 + "any system and following the instructions:\n" + regUrl
                 + "\n\n Hit OK once completed.");
+	try
+        {
+            System.in.read();
+        }  
+        catch(Exception e)
+        {}  
     }
 
     @Override
