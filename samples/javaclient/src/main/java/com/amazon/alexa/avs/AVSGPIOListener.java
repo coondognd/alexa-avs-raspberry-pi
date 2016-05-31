@@ -59,7 +59,7 @@ RegCodeDisplayHandler, AccessTokenListener {
         
         
 
-
+	/*
         // get a handle to the GPIO controller
     	final GpioController gpio = GpioFactory.getInstance(); 
     	
@@ -76,6 +76,8 @@ RegCodeDisplayHandler, AccessTokenListener {
             
         });
         System.out.println(" ... complete the GPIO #02 circuit and see the listener feedback here in the console.");
+	*/
+	actionPerformed();
         
         // keep program running until user aborts (CTRL-C)
         for (;;) {
@@ -170,11 +172,12 @@ RegCodeDisplayHandler, AccessTokenListener {
 
     }
     
-    public void actionPerformed(GpioPinDigitalStateChangeEvent event) {
+    //public void actionPerformed(GpioPinDigitalStateChangeEvent event) {
+    public void actionPerformed() {
         final RecordingRMSListener rmsListener = this;
         controller.onUserActivity();
         //if (actionButton.getText().equals(START_LABEL)) { // if in idle mode
-        if (event.getState() == PinState.HIGH) {
+        //if (event.getState() == PinState.HIGH) {
         //    actionButton.setText(STOP_LABEL);
 
             RequestListener requestListener = new RequestListener() {
@@ -193,11 +196,13 @@ RegCodeDisplayHandler, AccessTokenListener {
             };
 
             controller.startRecording(rmsListener, requestListener);
+	/*
         } else { // else we must already be in listening
           //  actionButton.setText(PROCESSING_LABEL); // go into processing mode
           //  actionButton.setEnabled(false);
            // visualizer.setIndeterminate(true);
             controller.stopRecording(); // stop the recording so the request can complete
         }
+	*/
     }
 }

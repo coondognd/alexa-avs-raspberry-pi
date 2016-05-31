@@ -70,10 +70,12 @@ RegCodeDisplayHandler, AccessTokenListener {
 	            connection = providerSocket.accept();
 	            System.out.println("Connection received from " + connection.getInetAddress().getHostName());
 	            //3. get Input and Output streams
-	            out = new ObjectOutputStream(connection.getOutputStream());
+	            /*
+		    out = new ObjectOutputStream(connection.getOutputStream());
 	            out.flush();
 	            in = new ObjectInputStream(connection.getInputStream());
 	            sendMessage("Connection successful");
+		    */
 	            /*
 	            //4. The two parts communicate via the input and output streams
 	            do{
@@ -88,7 +90,7 @@ RegCodeDisplayHandler, AccessTokenListener {
 	                }
 	            }while(!message.equals("bye"));
 	            */
-                actionPerformed();
+                     actionPerformed();
 	        }
 	        catch(IOException ioException){
 	            ioException.printStackTrace();
@@ -96,9 +98,11 @@ RegCodeDisplayHandler, AccessTokenListener {
 	        finally{
 	            //4: Closing connection
 	            try{
-	                in.close();
-	                out.close();
+	               // in.close();
+	                //out.close();
 	                providerSocket.close();
+	                System.out.println("Closing socket");
+
 	            }
 	            catch(IOException ioException){
 	                ioException.printStackTrace();
@@ -128,6 +132,7 @@ RegCodeDisplayHandler, AccessTokenListener {
                     public void run() {
                         try {
                             Thread.sleep(ENDPOINT_SECONDS * 1000);
+				controller.stopRecording();
                            // actionButton.doClick(); // hit stop if we get through the autoendpoint
                            //                         // time
                         } catch (InterruptedException e) {
@@ -216,7 +221,7 @@ RegCodeDisplayHandler, AccessTokenListener {
           //  actionButton.setText(PROCESSING_LABEL); // go into processing mode
           //  actionButton.setEnabled(false);
            // visualizer.setIndeterminate(true);
-            controller.stopRecording(); // stop the recording so the request can complete
+           // controller.stopRecording(); // stop the recording so the request can complete
         //}
     }
     void sendMessage(String msg)

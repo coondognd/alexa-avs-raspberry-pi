@@ -216,8 +216,9 @@
               <argument>-classpath</argument>
               <classpath/>
               <argument>-Djna.library.path=${env.VLC_PATH}</argument>
-              <argument>com.amazon.alexa.avs.AVSGPIOListener</argument>
-              <!--argument>com.amazon.alexa.avs.AVSSocketListener</argument-->
+              <!--argument>com.amazon.alexa.avs.AVSGPIOListener</argument-->
+              <argument>com.amazon.alexa.avs.AVSSocketListener</argument>
+              <!--argument>com.amazon.alexa.avs.AVSApp</argument-->
             </arguments>
           </configuration>
         </plugin>
