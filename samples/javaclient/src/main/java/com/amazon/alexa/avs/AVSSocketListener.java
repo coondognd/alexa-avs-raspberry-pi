@@ -74,7 +74,7 @@ RegCodeDisplayHandler, AccessTokenListener {
 		    out = new ObjectOutputStream(connection.getOutputStream());
 	            out.flush();
 	            in = new ObjectInputStream(connection.getInputStream());
-	            sendMessage("Connection successful");
+	            //sendMessage("Connection successful");
 		    */
 	            /*
 	            //4. The two parts communicate via the input and output streams
@@ -97,16 +97,7 @@ RegCodeDisplayHandler, AccessTokenListener {
 	        }
 	        finally{
 	            //4: Closing connection
-	            try{
-	               // in.close();
-	                //out.close();
-	                providerSocket.close();
-	                System.out.println("Closing socket");
-
-	            }
-	            catch(IOException ioException){
-	                ioException.printStackTrace();
-	            }
+		    closeSocket();
 	        }
         }
     }
@@ -191,6 +182,8 @@ RegCodeDisplayHandler, AccessTokenListener {
 
     public void finishProcessing() {
         controller.processingFinished();
+	sendMessage("Done");
+	closeSocket();
 
     }
     
@@ -234,6 +227,19 @@ RegCodeDisplayHandler, AccessTokenListener {
         catch(IOException ioException){
             ioException.printStackTrace();
         }
+    }
+
+    void closeSocket()
+    {
+            try{
+                in.close();
+                out.close();
+                providerSocket.close();
+            }
+            catch(IOException ioException){
+                ioException.printStackTrace();
+            }
+        
     }
 }
 
@@ -279,14 +285,7 @@ public class Provider{
         }
         finally{
             //4: Closing connection
-            try{
-                in.close();
-                out.close();
-                providerSocket.close();
-            }
-            catch(IOException ioException){
-                ioException.printStackTrace();
-            }
+		closeSocket();
         }
     }
     public static void main(String args[])
